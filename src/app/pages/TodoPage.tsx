@@ -1,46 +1,37 @@
 import { useState, useEffect } from "react";
-import { TodoItem, Todo } from "../components/TodoItem";
+import { TodoItem } from "../components/TodoItem";
+import type { Todo } from "../../types/todo";
 import { AddTodo } from "../components/AddTodo";
 import { CheckCircle } from "lucide-react";
+import {
+    fetchTodos,
+    createTodo,
+    clearTodos,
+    updateTodo
+} from "../../services/todoService";
 
-const STORAGE_KEY = "todos";
-
-function loadTodos(): Todo[] {
-    try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        return stored ? JSON.parse(stored) : [];
-    } catch {
-        return [];
-    }
-}
-
-function saveTodos(todos: Todo[]) {
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
-    } catch (error) {
-        console.error("저장 실패:", error);
-    }
-}
-
-export default function TodoPage() {
-    const [todos, setTodos] = useState<Todo[]>(loadTodos);
+export default async function TodoPage() {
+    const [todos, setTodos] = useState<Todo[]>([]);
     const [filter, setFilter] = useState<"all" | "active" | "completed">("all");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        saveTodos(todos);
-    }, [todos]);
+        fetchTodos()
+            .then(setTodos)
+            .catch((err) => setError(err.message))
+            .finally(() => setLoading(false));
+    }, []);
 
-    const addTodo = (text: string) => {
-        const newTodo: Todo = {
-        id: crypto.randomUUID(),
-        text,
-        completed: false,
-        createdAt: Date.now(),
-        };
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p>Error: {error}</p>;
+
+    const addTodo = async (text: string) => {
+        const newTodo: Todo = await createTodo(text);
         setTodos([newTodo, ...todos]);
     };
 
-    const toggleTodo = (id: string) => {
+    const toggleTodo = async (id: number) => {
         setTodos(
         todos.map((todo) =>
             todo.id === id ? { ...todo, completed: !todo.completed } : todo
@@ -48,11 +39,11 @@ export default function TodoPage() {
         );
     };
 
-    const deleteTodo = (id: string) => {
+    const deleteTodo = (id: number) => {
         setTodos(todos.filter((todo) => todo.id !== id));
     };
 
-    const editTodo = (id: string, newText: string) => {
+    const editTodo = (id: number, newText: string) => {
         setTodos(
         todos.map((todo) => (todo.id === id ? { ...todo, text: newText } : todo))
         );

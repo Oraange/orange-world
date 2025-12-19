@@ -1,3 +1,8 @@
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+
+/* 스크롤바가 나타날 때 레이아웃 shift 방지 */
+html {
+    overflow-y: scroll;
+}
