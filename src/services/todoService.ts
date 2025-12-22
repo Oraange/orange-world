@@ -27,8 +27,8 @@ export async function createTodo(text: string): Promise<Todo> {
     return res.json();
 }
 
-export async function clearTodos(deletedTodo: Todo): Promise<void> {
-    const res = await fetch(`${API_BASE_URL}/api/todos/${deletedTodo.id}`, {
+export async function clearTodos(id: number): Promise<void> {
+    const res = await fetch(`${API_BASE_URL}/api/todos/${id}`, {
         method: 'DELETE',
     });
 
@@ -38,7 +38,7 @@ export async function clearTodos(deletedTodo: Todo): Promise<void> {
 }
 
 export async function updateTodo(
-    id: string,
+    id: number,
     data: Partial<Pick<Todo, 'text' | 'completed'>>
 ): Promise<void> {
     const res = await fetch(`${API_BASE_URL}/api/todos/${id}`, {

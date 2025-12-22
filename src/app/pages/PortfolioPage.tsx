@@ -1,4 +1,20 @@
+import { useEffect } from "react";
+import { useLoading } from "../contexts/LoadingContext";
+
 export default function PortfolioPage() {
+  const { setIsLoading, setLoadingMessage } = useLoading();
+
+  useEffect(() => {
+    setIsLoading(true);
+    setLoadingMessage("포트폴리오를 불러오는 중...");
+    
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [setIsLoading, setLoadingMessage]);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center">

@@ -3,6 +3,7 @@ import { TodoItem } from "../components/TodoItem";
 import type { Todo } from "../../types/todo";
 import { AddTodo } from "../components/AddTodo";
 import { CheckCircle } from "lucide-react";
+import { useLoading } from "../contexts/LoadingContext";
 import {
     fetchTodos,
     createTodo,
@@ -10,20 +11,29 @@ import {
     updateTodo
 } from "../../services/todoService";
 
-export default async function TodoPage() {
+export default function TodoPage() {
     const [todos, setTodos] = useState<Todo[]>([]);
     const [filter, setFilter] = useState<"all" | "active" | "completed">("all");
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { setIsLoading, setLoadingMessage } = useLoading();
 
     useEffect(() => {
-        fetchTodos()
-            .then(setTodos)
-            .catch((err) => setError(err.message))
-            .finally(() => setLoading(false));
-    }, []);
+        const fetchData = async () => {
+            try {
+                setIsLoading(true);
+                setLoadingMessage("할 일 목록을 불러오는 중...");
+                const todos = await fetchTodos();
+                setTodos(todos);
+            } catch (err: any) {
+                setError(err.message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-    if (loading) return <p>Loading...</p>;
+        fetchData();
+    }, [setIsLoading, setLoadingMessage]);
+
     if (error) return <p>Error: {error}</p>;
 
     const addTodo = async (text: string) => {
@@ -32,6 +42,9 @@ export default async function TodoPage() {
     };
 
     const toggleTodo = async (id: number) => {
+        const todo = todos.find((t) => t.id === id);
+        if (!todo) return;
+        await updateTodo(id, { completed: !todo.completed });
         setTodos(
         todos.map((todo) =>
             todo.id === id ? { ...todo, completed: !todo.completed } : todo
@@ -39,11 +52,13 @@ export default async function TodoPage() {
         );
     };
 
-    const deleteTodo = (id: number) => {
+    const deleteTodo = async (id: number) => {
+        await clearTodos(id);
         setTodos(todos.filter((todo) => todo.id !== id));
     };
 
-    const editTodo = (id: number, newText: string) => {
+    const editTodo = async (id: number, newText: string) => {
+        await updateTodo(id, { text: newText });
         setTodos(
         todos.map((todo) => (todo.id === id ? { ...todo, text: newText } : todo))
         );
