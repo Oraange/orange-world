@@ -39,6 +39,15 @@
   npm run dev
   ```
 
+  ### environment
+
+  ```bash
+  # .env
+
+  VITE_DEV=true # Put your environment
+  VITE_API_BASE_URL=http://{your-url}:{your-port} # Put your url
+  ```
+
   ## 🛠️ Tech Stack
 
   - Frontend Framework: Vite-React
