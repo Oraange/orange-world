@@ -26,7 +26,8 @@ export function AlphaBaseball() {
   useEffect(() => {
     const loadWordList = async () => {
       try {
-        const response = await fetch("/src/app/assets/words.txt");
+        // Vite의 public 폴더는 루트 경로(/)로 접근 가능
+        const response = await fetch("/words.txt");
         const text = await response.text();
         const words = text
           .split("\n")
