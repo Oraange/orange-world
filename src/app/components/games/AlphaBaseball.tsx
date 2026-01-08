@@ -130,7 +130,12 @@ export function AlphaBaseball() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto relative">
+      {/* 게임 영역 블러 오버레이 */}
+      {gameStatus !== "playing" && (
+        <div className="absolute inset-0 backdrop-blur-sm z-40 rounded-lg"></div>
+      )}
+
       {/* 토스트 메시지 */}
       {toast.show && (
         <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ease-in-out">
@@ -246,8 +251,8 @@ export function AlphaBaseball() {
 
       {/* 게임 종료 팝업 */}
       {gameStatus !== "playing" && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 text-center animate-scale-in">
+        <div className="absolute inset-0 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 text-center">
             {gameStatus === "won" ? (
               <div>
                 <div className="text-7xl mb-4">🎉</div>
