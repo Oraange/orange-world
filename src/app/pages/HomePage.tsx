@@ -9,7 +9,7 @@ export default function HomePage() {
     // 페이지 진입 시 로딩 시뮬레이션
     setIsLoading(true);
     setLoadingMessage("홈페이지를 불러오는 중...");
-    
+
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 500);
@@ -21,12 +21,17 @@ export default function HomePage() {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* 저를 소개합니다 */}
       <section className="mb-16">
-        <h1 className="text-4xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-blue-600">
-          🍊 저를 소개합니다
-        </h1>
+        <div className="bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 rounded-2xl shadow-xl p-8 mb-8 text-center transform hover:scale-105 transition-transform duration-300">
+          <h1 className="text-4xl md:text-3xl font-bold text-white mb-2 drop-shadow-lg">
+            🍊 Orange World에 오신 것을 환영합니다!
+          </h1>
+          <p className="text-orange-100 text-lg font-medium">
+            저의 세계로 여러분을 초대합니다
+          </p>
+        </div>
         <div className="text-gray-700 leading-relaxed space-y-4">
           <p className="text-lg">
-            안녕하세요! 저는 [이름]입니다.
+            github, blog 등 자신의 성격, 강점 등을 추출하는 프로젝트
           </p>
           <p>
             [자기소개 내용을 여기에 작성하세요]
@@ -121,8 +126,8 @@ export default function HomePage() {
           <p className="text-gray-700 mb-6 text-lg">
             더 많은 프로젝트와 상세한 포트폴리오를 확인하고 싶으시다면
           </p>
-          <Link 
-            to="/portfolio" 
+          <Link
+            to="/portfolio"
             className="inline-block px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
           >
             포트폴리오 페이지로 이동 →
