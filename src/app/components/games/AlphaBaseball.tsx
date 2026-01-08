@@ -65,14 +65,19 @@ export function AlphaBaseball() {
   // 전역 키보드 이벤트 리스너
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (gameStatus !== "playing") return;
-
-      if (e.key === "Enter" && guess.length === 5) {
-        checkGuess();
-      } else if (e.key === "Backspace") {
-        setGuess((prev) => prev.slice(0, -1));
-      } else if (/^[a-zA-Z]$/.test(e.key) && guess.length < 5) {
-        setGuess((prev) => prev + e.key.toUpperCase());
+      if (e.key === "Enter") {
+        if (gameStatus !== "playing") {
+          // 게임이 끝난 경우 Enter로 다시 시작
+          initGame();
+        } else if (guess.length === 5) {
+          checkGuess();
+        }
+      } else if (gameStatus === "playing") {
+        if (e.key === "Backspace") {
+          setGuess((prev) => prev.slice(0, -1));
+        } else if (/^[a-zA-Z]$/.test(e.key) && guess.length < 5) {
+          setGuess((prev) => prev + e.key.toUpperCase());
+        }
       }
     };
 
@@ -113,40 +118,14 @@ export function AlphaBaseball() {
     const newResult: GameResult = { guess, strike, ball, out };
     const newHistory = [...history, newResult];
     setHistory(newHistory);
-    setAttempts(attempts + 1);
     setGuess("");
 
     if (strike === 5) {
       setGameStatus("won");
-    } else if (attempts > maxAttempts) {
+    } else if (attempts + 1 >= maxAttempts) {
       setGameStatus("lost");
     }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    // 더 이상 사용하지 않지만 호환성을 위해 유지
-    e.preventDefault();
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // 더 이상 사용하지 않지만 호환성을 위해 유지
-    e.preventDefault();
-  };
-
-  // 칸의 배경색 결정
-  const getCellColor = (rowIndex: number, colIndex: number) => {
-    if (rowIndex >= history.length) return "bg-white border-gray-300";
-
-    const result = history[rowIndex];
-    const guessLetter = result.guess[colIndex];
-
-    if (guessLetter === answer[colIndex]) {
-      return "bg-green-500 border-green-500 text-white"; // Strike
-    } else if (answer.includes(guessLetter)) {
-      return "bg-yellow-500 border-yellow-500 text-white"; // Ball
-    } else {
-      return "bg-gray-400 border-gray-400 text-white"; // Out
-    }
+    setAttempts(attempts + 1);
   };
 
   return (
@@ -170,51 +149,69 @@ export function AlphaBaseball() {
         </p>
         <div className="flex gap-4 mt-2 text-xs">
           <div className="flex items-center gap-1">
-            <div className="w-6 h-6 bg-green-500 rounded"></div>
+            <span className="font-semibold text-green-600">S (Strike):</span>
             <span>정답 위치</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-6 h-6 bg-yellow-500 rounded"></div>
+            <span className="font-semibold text-yellow-600">B (Ball):</span>
             <span>다른 위치</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-6 h-6 bg-gray-400 rounded"></div>
+            <span className="font-semibold text-gray-500">O (Out):</span>
             <span>없는 글자</span>
           </div>
         </div>
       </div>
 
-      {/* Wordle 격자 */}
+      {/* 게임 격자 */}
       <div className="bg-white border border-gray-200 rounded-lg p-6 mb-4">
         <div className="flex flex-col items-center gap-2 mb-6">
           {Array.from({ length: maxAttempts }).map((_, rowIndex) => (
-            <div key={rowIndex} className="flex gap-2">
-              {Array.from({ length: 5 }).map((_, colIndex) => {
-                let letter = "";
-                let colorClass = "bg-white border-gray-300";
+            <div key={rowIndex} className="flex items-center gap-4">
+              {/* 입력 칸들 */}
+              <div className="flex gap-2">
+                {Array.from({ length: 5 }).map((_, colIndex) => {
+                  let letter = "";
+                  let borderColor = "border-gray-300";
 
-                if (rowIndex < history.length) {
-                  // 이미 제출된 행
-                  letter = history[rowIndex].guess[colIndex];
-                  colorClass = getCellColor(rowIndex, colIndex);
-                } else if (rowIndex === history.length) {
-                  // 현재 입력 중인 행
-                  letter = guess[colIndex] || "";
-                  colorClass =
-                    letter !== ""
-                      ? "bg-white border-blue-500"
-                      : "bg-white border-gray-300";
-                }
+                  if (rowIndex < history.length) {
+                    // 이미 제출된 행
+                    letter = history[rowIndex].guess[colIndex];
+                    borderColor = "border-gray-400";
+                  } else if (rowIndex === history.length) {
+                    // 현재 입력 중인 행
+                    letter = guess[colIndex] || "";
+                    borderColor =
+                      letter !== "" ? "border-blue-500" : "border-gray-300";
+                  }
 
-                return (
-                  <div
-                    key={colIndex}
-                    className={`w-14 h-14 border-2 rounded-lg flex items-center justify-center text-2xl font-bold transition-all duration-300 ${colorClass}`}
-                  >
-                    {letter}
-                  </div>
-                );
-              })}
+                  return (
+                    <div
+                      key={colIndex}
+                      className={`w-12 h-12 border-2 ${borderColor} rounded-md flex items-center justify-center text-xl font-bold transition-all duration-200 bg-white`}
+                    >
+                      {letter}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* 결과 표시 (제출된 행에만) */}
+              <div className="w-24 text-left">
+                {rowIndex < history.length && (
+                  <span className="text-sm font-semibold text-gray-700">
+                    <span className="text-green-600">
+                      {history[rowIndex].strike}S
+                    </span>{" "}
+                    <span className="text-yellow-600">
+                      {history[rowIndex].ball}B
+                    </span>{" "}
+                    <span className="text-gray-500">
+                      {history[rowIndex].out}O
+                    </span>
+                  </span>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -246,37 +243,45 @@ export function AlphaBaseball() {
         </div>
       </div>
 
-      {/* 게임 종료 메시지 */}
+      {/* 게임 종료 팝업 */}
       {gameStatus !== "playing" && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6 text-center">
-          {gameStatus === "won" ? (
-            <div>
-              <div className="text-6xl mb-4">🎉</div>
-              <h3 className="text-3xl font-bold text-green-600 mb-2">
-                축하합니다!
-              </h3>
-              <p className="text-lg text-gray-700 mb-4">
-                {attempts}번 만에 단어를 맞히셨습니다!
-              </p>
-            </div>
-          ) : (
-            <div>
-              <div className="text-6xl mb-4">😢</div>
-              <h3 className="text-3xl font-bold text-red-600 mb-2">
-                아쉽네요!
-              </h3>
-              <p className="text-lg text-gray-700 mb-4">
-                정답은 <span className="font-bold text-blue-600">{answer}</span>
-                였습니다.
-              </p>
-            </div>
-          )}
-          <button
-            onClick={initGame}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
-          >
-            다시 시작
-          </button>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 text-center animate-scale-in">
+            {gameStatus === "won" ? (
+              <div>
+                <div className="text-7xl mb-4">🎉</div>
+                <h3 className="text-3xl font-bold text-green-600 mb-3">
+                  축하합니다!
+                </h3>
+                <p className="text-lg text-gray-700 mb-6">
+                  {attempts}번 만에 단어를 맞히셨습니다!
+                </p>
+              </div>
+            ) : (
+              <div>
+                <div className="text-7xl mb-4">😢</div>
+                <h3 className="text-3xl font-bold text-red-600 mb-3">
+                  아쉽네요!
+                </h3>
+                <p className="text-lg text-gray-700 mb-2">
+                  정답은{" "}
+                  <span className="font-bold text-blue-600 text-2xl">
+                    {answer}
+                  </span>
+                  였습니다.
+                </p>
+                <p className="text-sm text-gray-500 mb-6">
+                  다음에는 꼭 맞춰보세요!
+                </p>
+              </div>
+            )}
+            <button
+              onClick={initGame}
+              className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-lg shadow-lg"
+            >
+              다시 시작 (Enter)
+            </button>
+          </div>
         </div>
       )}
     </div>
