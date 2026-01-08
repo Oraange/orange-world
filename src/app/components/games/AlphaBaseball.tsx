@@ -30,7 +30,7 @@ export function AlphaBaseball() {
         const text = await response.text();
         const words = text
           .split("\n")
-          .map((word) => word.trim().toLowerCase())
+          .map((word) => word.trim().toUpperCase())
           .filter((word) => word.length === 5);
         setWordList(words);
       } catch (error) {
@@ -62,9 +62,37 @@ export function AlphaBaseball() {
     }
   }, [wordList]);
 
+  // 전역 키보드 이벤트 리스너
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (gameStatus !== "playing") return;
+
+      if (e.key === "Enter" && guess.length === 5) {
+        checkGuess();
+      } else if (e.key === "Backspace") {
+        setGuess((prev) => prev.slice(0, -1));
+      } else if (/^[a-zA-Z]$/.test(e.key) && guess.length < 5) {
+        setGuess((prev) => prev + e.key.toUpperCase());
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [gameStatus, guess]);
+
   const checkGuess = () => {
     if (guess.length !== 5) {
       showToast("5글자 단어를 입력해주세요!");
+      return;
+    }
+
+    if (/^[a-zA-Z]{5}$/.test(guess) === false) {
+      showToast("영어 알파벳 5글자만 입력 가능합니다!");
+      return;
+    }
+
+    if (!wordList.includes(guess.toUpperCase())) {
+      showToast("단어 목록에 없는 단어입니다!");
       return;
     }
 
@@ -96,10 +124,31 @@ export function AlphaBaseball() {
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      checkGuess();
+    // 더 이상 사용하지 않지만 호환성을 위해 유지
+    e.preventDefault();
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // 더 이상 사용하지 않지만 호환성을 위해 유지
+    e.preventDefault();
+  };
+
+  // 칸의 배경색 결정
+  const getCellColor = (rowIndex: number, colIndex: number) => {
+    if (rowIndex >= history.length) return "bg-white border-gray-300";
+
+    const result = history[rowIndex];
+    const guessLetter = result.guess[colIndex];
+
+    if (guessLetter === answer[colIndex]) {
+      return "bg-green-500 border-green-500 text-white"; // Strike
+    } else if (answer.includes(guessLetter)) {
+      return "bg-yellow-500 border-yellow-500 text-white"; // Ball
+    } else {
+      return "bg-gray-400 border-gray-400 text-white"; // Out
     }
   };
+
   return (
     <div className="max-w-6xl mx-auto">
       {/* 토스트 메시지 */}
@@ -112,86 +161,124 @@ export function AlphaBaseball() {
         </div>
       )}
       {/* 게임 설명 */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
-        <h2 className="text-2xl font-semibold text-blue-900 mb-2">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <h2 className="text-xl font-semibold text-blue-900 mb-1">
           단어 야구 게임
         </h2>
-        <p className="text-blue-800">
-          5글자 영어 단어를 맞춰보세요! 글자가 맞으면 스트라이크, 글자는
-          틀렸지만 단어에 포함되어 있으면 볼, 단어에 포함되지 않으면 아웃입니다.
-          6번의 기회 안에 단어를 맞히면 승리합니다!
+        <p className="text-sm text-blue-800">
+          5글자 영어 단어를 맞춰보세요! {maxAttempts}번의 기회가 있습니다.
         </p>
+        <div className="flex gap-4 mt-2 text-xs">
+          <div className="flex items-center gap-1">
+            <div className="w-6 h-6 bg-green-500 rounded"></div>
+            <span>정답 위치</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-6 h-6 bg-yellow-500 rounded"></div>
+            <span>다른 위치</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-6 h-6 bg-gray-400 rounded"></div>
+            <span>없는 글자</span>
+          </div>
+        </div>
       </div>
-      {/* 게임 인터페이스 */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <div className="flex gap-2 mb-4">
-          <input
-            type="text"
-            value={guess}
-            onChange={(e) => setGuess(e.target.value)}
-            onKeyPress={handleKeyPress}
-            maxLength={5}
-            className="flex-1 px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-xl text-center font-bold"
-            placeholder="5글자 단어 입력"
-          />
+
+      {/* Wordle 격자 */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6 mb-4">
+        <div className="flex flex-col items-center gap-2 mb-6">
+          {Array.from({ length: maxAttempts }).map((_, rowIndex) => (
+            <div key={rowIndex} className="flex gap-2">
+              {Array.from({ length: 5 }).map((_, colIndex) => {
+                let letter = "";
+                let colorClass = "bg-white border-gray-300";
+
+                if (rowIndex < history.length) {
+                  // 이미 제출된 행
+                  letter = history[rowIndex].guess[colIndex];
+                  colorClass = getCellColor(rowIndex, colIndex);
+                } else if (rowIndex === history.length) {
+                  // 현재 입력 중인 행
+                  letter = guess[colIndex] || "";
+                  colorClass =
+                    letter !== ""
+                      ? "bg-white border-blue-500"
+                      : "bg-white border-gray-300";
+                }
+
+                return (
+                  <div
+                    key={colIndex}
+                    className={`w-14 h-14 border-2 rounded-lg flex items-center justify-center text-2xl font-bold transition-all duration-300 ${colorClass}`}
+                  >
+                    {letter}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+
+        {/* 제출 버튼 */}
+        <div className="flex flex-col items-center gap-3">
           <button
             onClick={checkGuess}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            disabled={guess.length !== 5 || gameStatus !== "playing"}
+            className={`px-8 py-3 rounded-lg font-semibold text-lg transition-colors ${
+              guess.length === 5 && gameStatus === "playing"
+                ? "bg-blue-600 text-white hover:bg-blue-700"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
           >
-            확인
+            제출 (Enter)
           </button>
+          <p className="text-sm text-gray-500">
+            키보드로 입력하고 Enter를 눌러 제출하세요
+          </p>
         </div>
-        <div className="mb-4">
+
+        {/* 시도 횟수 */}
+        <div className="mt-4 text-center">
           <div className="text-base font-semibold text-gray-700">
             시도 횟수: <span className="text-blue-600">{attempts}</span> /{" "}
             {maxAttempts}
           </div>
         </div>
-        {/* 결과 히스토리 */}
-        <div className="space-y-3 max-h-96 overflow-y-auto">
-          {history.map((result, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg"
-            >
-              <span className="text-2xl font-bold text-gray-900">
-                {result.guess}
-              </span>
-              <div className="flex gap-2">
-                <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full font-semibold text-sm">
-                  {result.strike}S
-                </span>
-                <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full font-semibold text-sm">
-                  {result.ball}B
-                </span>
-                <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full font-semibold text-sm">
-                  {result.out}O
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-        {/* 게임 종료 메시지 */}
-        {gameStatus !== "playing" && (
-          <div className="mt-6 p-4 bg-green-100 border border-green-200 rounded-lg text-center">
-            {gameStatus === "won" ? (
-              <h3 className="text-2xl font-bold text-green-800">
-                🎉 축하합니다! 단어를 맞히셨습니다! 🎉
-              </h3>
-            ) : (
-              <h3 className="text-2xl font-bold text-red-800">
-                😞 아쉽네요! 정답은 "{answer.toUpperCase()}"였습니다. 😞
-              </h3>
-            )}
-            <button
-              onClick={initGame}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              다시 시작
-            </button>
-          </div>
-        )}
       </div>
+
+      {/* 게임 종료 메시지 */}
+      {gameStatus !== "playing" && (
+        <div className="bg-white border border-gray-200 rounded-lg p-6 text-center">
+          {gameStatus === "won" ? (
+            <div>
+              <div className="text-6xl mb-4">🎉</div>
+              <h3 className="text-3xl font-bold text-green-600 mb-2">
+                축하합니다!
+              </h3>
+              <p className="text-lg text-gray-700 mb-4">
+                {attempts}번 만에 단어를 맞히셨습니다!
+              </p>
+            </div>
+          ) : (
+            <div>
+              <div className="text-6xl mb-4">😢</div>
+              <h3 className="text-3xl font-bold text-red-600 mb-2">
+                아쉽네요!
+              </h3>
+              <p className="text-lg text-gray-700 mb-4">
+                정답은 <span className="font-bold text-blue-600">{answer}</span>
+                였습니다.
+              </p>
+            </div>
+          )}
+          <button
+            onClick={initGame}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+          >
+            다시 시작
+          </button>
+        </div>
+      )}
     </div>
   );
 }
