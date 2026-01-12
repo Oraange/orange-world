@@ -33,11 +33,14 @@ export default function HomePage() {
           <p className="text-lg">
             github, blog 등 자신의 성격, 강점 등을 추출하는 프로젝트
           </p>
+          <h2>일단 부딪혀 보는 개발자 송치헌입니다.</h2>
           <p>
-            [자기소개 내용을 여기에 작성하세요]
+            - 끊임없이 배우고 성장하는 개발자입니다. 새로운 기술과 도전에 열려
+            있으며, 문제 해결에 대한 열정을 가지고 있습니다.
           </p>
           <p>
-            [추가 소개 내용]
+            - 협업과 소통을 중요시하며, 팀원들과 함께 목표를 달성하는 데
+            기여합니다.
           </p>
         </div>
       </section>
@@ -49,25 +52,24 @@ export default function HomePage() {
         </h1>
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              [회사명]
-            </h3>
-            <p className="text-gray-600 mb-2">[직책] | [근무기간]</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">[BD]</h3>
+            <p className="text-gray-600 mb-2">전임 | 2025-11-10 ~ 2026-03-31</p>
             <ul className="list-disc list-inside text-gray-700 space-y-1">
-              <li>[주요 업무 내용 1]</li>
-              <li>[주요 업무 내용 2]</li>
-              <li>[주요 업무 내용 3]</li>
+              <li>고객사 요청 대응</li>
+              <li>서버 운영 및 관리</li>
             </ul>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              [회사명]
+              [에이아이톡]
             </h3>
-            <p className="text-gray-600 mb-2">[직책] | [근무기간]</p>
+            <p className="text-gray-600 mb-2">
+              연구원 | 2022-01-10 ~ 2025-05-31
+            </p>
             <ul className="list-disc list-inside text-gray-700 space-y-1">
-              <li>[주요 업무 내용 1]</li>
-              <li>[주요 업무 내용 2]</li>
+              <li>STT 기반 웹 어플리케이션 서버 개발 및 관리</li>
+              <li>또 생각나면 적기</li>
             </ul>
           </div>
         </div>
@@ -80,38 +82,82 @@ export default function HomePage() {
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">Frontend</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">
+              Frontend
+            </h3>
             <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">React</span>
-              <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">TypeScript</span>
-              <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Tailwind CSS</span>
-              <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">[기술명]</span>
+              <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                React
+              </span>
+              <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                TypeScript
+              </span>
+              <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                Tailwind CSS
+              </span>
+              <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                Prisma
+              </span>
             </div>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">Backend</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">
+              Backend
+            </h3>
             <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">Node.js</span>
-              <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">[기술명]</span>
-              <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">[기술명]</span>
+              <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                Node.js
+              </span>
+              <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                Express.js
+              </span>
+              <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                Supabase
+              </span>
+              <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                Django
+              </span>
+              <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                Django Rest Framework
+              </span>
             </div>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">Database</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">
+              Database
+            </h3>
             <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">MySQL</span>
-              <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">[기술명]</span>
+              <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">
+                MySQL
+              </span>
+              <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">
+                PostgreSQL
+              </span>
+              <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">
+                Redis
+              </span>
             </div>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">Tools & Others</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">
+              Tools & Others
+            </h3>
             <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">Git</span>
-              <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">Docker</span>
-              <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">[기술명]</span>
+              <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">
+                Git
+              </span>
+              <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">
+                Docker
+              </span>
+              <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">
+                Jenkins
+              </span>
+              <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">
+                Nginx
+              </span>
             </div>
           </div>
         </div>

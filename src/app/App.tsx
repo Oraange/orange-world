@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
 import { LoadingProvider, useLoading } from "./contexts/LoadingContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import { LoadingOverlay } from "./components/LoadingOverlay";
 import HomePage from "./pages/HomePage";
 import TodoPage from "./pages/TodoPage";
@@ -29,9 +30,11 @@ function AppContent() {
 export default function App() {
   return (
     <Router>
-      <LoadingProvider>
-        <AppContent />
-      </LoadingProvider>
+      <AuthProvider>
+        <LoadingProvider>
+          <AppContent />
+        </LoadingProvider>
+      </AuthProvider>
     </Router>
   );
 }
