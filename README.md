@@ -45,6 +45,8 @@ npm run dev
 
 VITE_DEV=true # Put your environment
 VITE_API_BASE_URL=http://{your-url}:{your-port} # Put your url
+VITE_SUPABASE_URL=https://{supabase-url} # 현재는 supabase BaaS로 서비스 중
+VITE_SUPABASE_ANON_KEY={anon-key}
 ```
 
 ## 🛠️ Tech Stack
