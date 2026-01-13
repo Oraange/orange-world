@@ -1,55 +1,59 @@
 import type { Todo } from "../types/todo";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+import { supabase } from "../lib/supabaseClient";
 
 export async function fetchTodos(): Promise<Todo[]> {
-    const res = await fetch(`${API_BASE_URL}/api/todos`);
-
-    if (!res.ok) {
-        throw new Error('Failed to fetch todos');
+  try {
+    const { data, error } = await supabase
+      .from("todo")
+      .select("*")
+      .order("id", { ascending: false });
+    if (error) {
+      console.error("Supabase fetch error:", error);
+      throw error;
     }
-
-    return res.json();
+    return data as Todo[];
+  } catch (error) {
+    throw new Error("Failed to fetch todos");
+  }
 }
 
 export async function createTodo(text: string): Promise<Todo> {
-    const res = await fetch(`${API_BASE_URL}/api/todos`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ text }),
-    });
-
-    if (!res.ok) {
-        throw new Error('Failed to save todos');
+  try {
+    const { data, error } = await supabase
+      .from("todo")
+      .insert([{ text, completed: false }])
+      .select()
+      .single();
+    if (error) {
+      throw error;
     }
-    return res.json();
+    return data as Todo;
+  } catch (error) {
+    throw new Error("Failed to save todo");
+  }
 }
 
 export async function clearTodos(id: number): Promise<void> {
-    const res = await fetch(`${API_BASE_URL}/api/todos/${id}`, {
-        method: 'DELETE',
-    });
-
-    if (!res.ok) {
-        throw new Error('Failed to clear todos');
+  try {
+    const { error } = await supabase.from("todo").delete().eq("id", id);
+    if (error) {
+      throw error;
     }
+  } catch (error) {
+    throw new Error("Failed to clear todo");
+  }
 }
 
 export async function updateTodo(
-    id: number,
-    data: Partial<Pick<Todo, 'text' | 'completed'>>
+  id: number,
+  data: Partial<Pick<Todo, "text" | "completed">>
 ): Promise<void> {
-    const res = await fetch(`${API_BASE_URL}/api/todos/${id}`, {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    });
-
-    if (!res.ok) {
-        throw new Error('Failed to update todo');
+  try {
+    const { error } = await supabase.from("todo").update(data).eq("id", id);
+    if (error) {
+      throw error;
     }
+  } catch (error) {
+    throw new Error("Failed to update todo");
+  }
 }
